@@ -21,7 +21,7 @@ namespace ClimatizadorAquario2.Controllers
 
         [HttpGet]
         [Produces("application/json")]
-        public IActionResult Test()
+        public IActionResult RetornaInfo()
         {
             try
             {
