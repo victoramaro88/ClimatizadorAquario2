@@ -38,13 +38,13 @@ namespace ClimatizadorAquario2.Controllers
             }
         }
 
-        [HttpGet("{idConfig}/{descLocal}/{dataAtualizacao}/{infoMACUltimoAcesso}/{temperatura}/{flagIluminacao}/{flagAquecedor}/{flagResfriador}/{flagFiltro}/{flagEncher}/{flagEsvaziar}")]
+        [HttpGet("{idConfig}/{descLocal}/{dataAtualizacao}/{infoMACUltimoAcesso}/{temperatura}/{tempMaxResfr}/{tempMinAquec}/{tempDesliga}/{flagIluminacao}/{flagAquecedor}/{flagResfriador}/{flagFiltro}/{flagEncher}/{flagEsvaziar}")]
         [Produces("application/json")]
-        public IActionResult ManterInfo(int idConfig, string descLocal, DateTime dataAtualizacao, string infoMACUltimoAcesso, decimal temperatura,
-            bool flagIluminacao, bool flagAquecedor, bool flagResfriador, bool flagFiltro, bool flagEncher, bool flagEsvaziar)
+        public IActionResult ManterInfo(int idConfig, string descLocal, DateTime dataAtualizacao, string infoMACUltimoAcesso, decimal temperatura, decimal tempMaxResfr,
+            decimal tempMinAquec, decimal tempDesliga, bool flagIluminacao, bool flagAquecedor, bool flagResfriador, bool flagFiltro, bool flagEncher, bool flagEsvaziar)
         {
-            string validacaoConfig = ValidaEntradaConfig(idConfig, descLocal, dataAtualizacao, infoMACUltimoAcesso, temperatura,
-            flagIluminacao, flagAquecedor, flagResfriador, flagFiltro, flagEncher, flagEsvaziar);
+            string validacaoConfig = ValidaEntradaConfig(idConfig, descLocal, dataAtualizacao, infoMACUltimoAcesso, temperatura, tempMaxResfr,
+            tempMinAquec, tempDesliga, flagIluminacao, flagAquecedor, flagResfriador, flagFiltro, flagEncher, flagEsvaziar);
             if (validacaoConfig == "OK")
             {
                 ConfigModel objModel = new ConfigModel();
@@ -55,6 +55,9 @@ namespace ClimatizadorAquario2.Controllers
                     objModel.dataAtualizacao = dataAtualizacao;
                     objModel.infoMACUltimoAcesso = infoMACUltimoAcesso;
                     objModel.temperatura = temperatura;
+                    objModel.tempMaxResfr = tempMaxResfr;
+                    objModel.tempMinAquec = tempMinAquec;
+                    objModel.tempDesliga = tempDesliga;
                     objModel.flagIluminacao = flagIluminacao;
                     objModel.flagAquecedor = flagAquecedor;
                     objModel.flagResfriador = flagResfriador;
@@ -81,8 +84,8 @@ namespace ClimatizadorAquario2.Controllers
             }
         }
 
-        private string ValidaEntradaConfig(int idConfig, string descLocal, DateTime dataAtualizacao, string infoMACUltimoAcesso, decimal temperatura,
-            bool flagIluminacao, bool flagAquecedor, bool flagResfriador, bool flagFiltro, bool flagEncher, bool flagEsvaziar)
+        private string ValidaEntradaConfig(int idConfig, string descLocal, DateTime dataAtualizacao, string infoMACUltimoAcesso, decimal temperatura, decimal tempMaxResfr,
+            decimal tempMinAquec, decimal tempDesliga, bool flagIluminacao, bool flagAquecedor, bool flagResfriador, bool flagFiltro, bool flagEncher, bool flagEsvaziar)
         {
             if (idConfig > 0)
             {
@@ -94,57 +97,81 @@ namespace ClimatizadorAquario2.Controllers
                     {
                         if (!String.IsNullOrEmpty(infoMACUltimoAcesso))
                         {
-                            bool decimalValido = decimal.TryParse(temperatura.ToString(), out temperatura) && temperatura < 50;
-                            if (decimalValido)
+                            bool decimalTempValido = decimal.TryParse(temperatura.ToString(), out temperatura) && temperatura < 50;
+                            if (decimalTempValido)
                             {
-                                bool validaIluminacao = bool.TryParse(flagIluminacao.ToString(), out flagIluminacao);
-                                if (validaIluminacao)
+                                bool decimalTempMaxResfValido = decimal.TryParse(tempMaxResfr.ToString(), out tempMaxResfr) && tempMaxResfr < 50;
+                                if (decimalTempMaxResfValido)
                                 {
-                                    bool validaAquecedor = bool.TryParse(flagAquecedor.ToString(), out flagAquecedor);
-                                    if (validaAquecedor)
+                                    bool decimalTempMinResfValido = decimal.TryParse(tempMinAquec.ToString(), out tempMinAquec) && tempMinAquec < 50;
+                                    if (decimalTempMinResfValido)
                                     {
-                                        bool validaResfriador = bool.TryParse(flagResfriador.ToString(), out flagResfriador);
-                                        if (validaResfriador)
+                                        bool decimalDeslResfValido = decimal.TryParse(tempDesliga.ToString(), out tempDesliga) && tempDesliga < 50;
+                                        if (decimalDeslResfValido)
                                         {
-                                            bool validaFiltro = bool.TryParse(flagFiltro.ToString(), out flagFiltro);
-                                            if (validaFiltro)
+                                            bool validaIluminacao = bool.TryParse(flagIluminacao.ToString(), out flagIluminacao);
+                                            if (validaIluminacao)
                                             {
-                                                bool validaEncher = bool.TryParse(flagEncher.ToString(), out flagEncher);
-                                                if (validaEncher)
+                                                bool validaAquecedor = bool.TryParse(flagAquecedor.ToString(), out flagAquecedor);
+                                                if (validaAquecedor)
                                                 {
-                                                    bool validaEsvaziar = bool.TryParse(flagEsvaziar.ToString(), out flagEsvaziar);
-                                                    if (validaEsvaziar)
+                                                    bool validaResfriador = bool.TryParse(flagResfriador.ToString(), out flagResfriador);
+                                                    if (validaResfriador)
                                                     {
-                                                        return "OK";
+                                                        bool validaFiltro = bool.TryParse(flagFiltro.ToString(), out flagFiltro);
+                                                        if (validaFiltro)
+                                                        {
+                                                            bool validaEncher = bool.TryParse(flagEncher.ToString(), out flagEncher);
+                                                            if (validaEncher)
+                                                            {
+                                                                bool validaEsvaziar = bool.TryParse(flagEsvaziar.ToString(), out flagEsvaziar);
+                                                                if (validaEsvaziar)
+                                                                {
+                                                                    return "OK";
+                                                                }
+                                                                else
+                                                                {
+                                                                    return "Valor booleano de esvaziar inválido.";
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                return "Valor booleano de encher inválido.";
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            return "Valor booleano do filtro inválido.";
+                                                        }
                                                     }
                                                     else
                                                     {
-                                                        return "Valor booleano de esvaziar inválido.";
+                                                        return "Valor booleano do resfriador inválido.";
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    return "Valor booleano de encher inválido.";
+                                                    return "Valor booleano do aquecedor inválido.";
                                                 }
                                             }
                                             else
                                             {
-                                                return "Valor booleano do filtro inválido.";
+                                                return "Valor booleano da iluminação inválido.";
                                             }
                                         }
                                         else
                                         {
-                                            return "Valor booleano do resfriador inválido.";
+                                            return "Temperatura para desligamento inválida.";
                                         }
                                     }
                                     else
                                     {
-                                        return "Valor booleano do aquecedor inválido.";
+                                        return "Temperatura mínima inválida.";
                                     }
                                 }
                                 else
                                 {
-                                    return "Valor booleano da iluminação inválido.";
+                                    return "Temperatura máxima inválida.";
                                 }
                             }
                             else

@@ -12,6 +12,9 @@ namespace ClimatizadorAquario2.Models
         public DateTime dataAtualizacao { get; set; }
         public string infoMACUltimoAcesso { get; set; }
         public decimal temperatura { get; set; }
+        public decimal tempMaxResfr { get; set; }
+        public decimal tempMinAquec { get; set; }
+        public decimal tempDesliga { get; set; }
         public bool flagIluminacao { get; set; }
         public bool flagAquecedor { get; set; }
         public bool flagResfriador { get; set; }

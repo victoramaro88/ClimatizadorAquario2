@@ -28,8 +28,9 @@ namespace ClimatizadorAquario2.Repository
                 using (SqlConnection con = new SqlConnection(_bdAquario))
                 {
                     query = @"
-                            SELECT [idConfig],[descLocal],[dataAtualizacao],[infoMACUltimoAcesso],[temperatura],[flagIluminacao]
-                                  ,[flagAquecedor],[flagResfriador],[flagFiltro],[flagEncher],[flagEsvaziar]
+                            SELECT [idConfig],[descLocal],[dataAtualizacao],[infoMACUltimoAcesso],[temperatura],[tempMaxResfr]
+                                  ,[tempMinAquec],[tempDesliga],[flagIluminacao],[flagAquecedor],[flagResfriador],[flagFiltro]
+                                  ,[flagEncher],[flagEsvaziar]
                               FROM [aquario].[amaro.victor].[ConfAquario]";
 
                     SqlCommand com = new SqlCommand(query, con);
@@ -47,6 +48,9 @@ namespace ClimatizadorAquario2.Repository
                                 dataAtualizacao = DateTime.Parse(reader["dataAtualizacao"].ToString()),
                                 infoMACUltimoAcesso = reader["infoMACUltimoAcesso"].ToString(),
                                 temperatura = decimal.Parse(reader["temperatura"].ToString()),
+                                tempMaxResfr = decimal.Parse(reader["tempMaxResfr"].ToString()),
+                                tempMinAquec = decimal.Parse(reader["tempMinAquec"].ToString()),
+                                tempDesliga = decimal.Parse(reader["tempDesliga"].ToString()),
                                 flagIluminacao = bool.Parse(reader["flagIluminacao"].ToString()),
                                 flagAquecedor = bool.Parse(reader["flagAquecedor"].ToString()),
                                 flagResfriador = bool.Parse(reader["flagResfriador"].ToString()),
@@ -91,6 +95,9 @@ namespace ClimatizadorAquario2.Repository
 			                              ,[dataAtualizacao] = '" + objModel.dataAtualizacao + @"'
 			                              ,[infoMACUltimoAcesso] = '" + objModel.infoMACUltimoAcesso + @"'
 			                              ,[temperatura] = " + objModel.temperatura.ToString().Replace(",", ".") + @"
+			                              ,[tempMaxResfr] = " + objModel.tempMaxResfr.ToString().Replace(",", ".") + @"
+			                              ,[tempMinAquec] = " + objModel.tempMinAquec.ToString().Replace(",", ".") + @"
+			                              ,[tempDesliga] = " + objModel.tempDesliga.ToString().Replace(",", ".") + @"
 			                              ,[flagIluminacao] = " + (objModel.flagIluminacao ? 1 : 0) + @"
 			                              ,[flagAquecedor] = " + (objModel.flagAquecedor ? 1 : 0) + @"
 			                              ,[flagResfriador] = " + (objModel.flagResfriador ? 1 : 0) + @"
@@ -106,14 +113,16 @@ namespace ClimatizadorAquario2.Repository
                             ELSE
 	                            BEGIN TRY
 		                            INSERT INTO [amaro.victor].[ConfAquario]
-			                               ([descLocal],[dataAtualizacao],[infoMACUltimoAcesso],[temperatura]
-			                               ,[flagIluminacao],[flagAquecedor],[flagResfriador],[flagFiltro]
-			                               ,[flagEncher],[flagEsvaziar])
+			                               ([descLocal],[dataAtualizacao],[infoMACUltimoAcesso],[temperatura],[tempMaxResfr],[tempMinAquec],[tempDesliga]
+			                               ,[flagIluminacao],[flagAquecedor],[flagResfriador],[flagFiltro],[flagEncher],[flagEsvaziar])
 		                             VALUES
 			                               ('" + objModel.descLocal + @"'
 			                               ,'" + objModel.dataAtualizacao + @"'
 			                               ,'" + objModel.infoMACUltimoAcesso + @"'
 			                               ," + objModel.temperatura.ToString().Replace(",", ".") + @"
+			                               ," + objModel.tempMaxResfr.ToString().Replace(",", ".") + @"
+			                               ," + objModel.tempMinAquec.ToString().Replace(",", ".") + @"
+			                               ," + objModel.tempDesliga.ToString().Replace(",", ".") + @"
 			                               ," + (objModel.flagIluminacao ? 1 : 0) + @"
 			                               ," + (objModel.flagAquecedor ? 1 : 0) + @"
 			                               ," + (objModel.flagResfriador ? 1 : 0) + @"
