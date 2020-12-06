@@ -30,7 +30,8 @@ namespace ClimatizadorAquario2.Repository
                     query = @"
                             SELECT [idUsuario],[usuarioNome],[usuarioLogin],[usuarioSenha]
                               FROM [aquario].[amaro.victor].[UsuarioAcesso]
-                              WHERE [usuarioLogin] = '" + usuario + @"' AND [usuarioSenha] = '" + senha + @"'";
+                              WHERE CAST([usuarioLogin] AS varbinary(50)) = CAST('" + usuario + @"' AS varbinary(50))
+	                            AND CAST([usuarioSenha] AS varbinary(20)) = CAST('" + senha + @"' AS varbinary(20))";
 
                     SqlCommand com = new SqlCommand(query, con);
                     con.Open();
