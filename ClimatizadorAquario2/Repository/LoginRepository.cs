@@ -28,10 +28,24 @@ namespace ClimatizadorAquario2.Repository
                 using (SqlConnection con = new SqlConnection(_bdAquario))
                 {
                     query = @"
-                            SELECT [idUsuario],[usuarioNome],[usuarioLogin],[usuarioSenha]
-                              FROM [aquario].[amaro.victor].[UsuarioAcesso]
-                              WHERE CAST([usuarioLogin] AS varbinary(50)) = CAST('" + usuario + @"' AS varbinary(50))
-	                            AND CAST([usuarioSenha] AS varbinary(20)) = CAST('" + senha + @"' AS varbinary(20))";
+                            DECLARE @usr varchar(100) = '" + usuario + @"'
+                            , @senh Varchar(20) = '" + senha + @"', @idUsr int = 0
+
+                            SET @idUsr = (SELECT [idUsuario] FROM [aquario].[amaro.victor].[UsuarioAcesso]
+		                            WHERE CAST([usuarioLogin] AS varbinary(50)) = CAST(@usr AS varbinary(50)))
+
+                            IF
+	                            @idUsr > 0
+	                            BEGIN
+		                            DECLARE @SenhaBanco varbinary(100) = (SELECT usuarioSenha FROM [aquario].[amaro.victor].[UsuarioAcesso] WHERE [idUsuario] = @idUsr)
+		                            IF
+			                            (select pwdCompare(@senh, @SenhaBanco, 0)) = 1
+			                            BEGIN
+				                            SELECT [idUsuario],[usuarioNome],[usuarioLogin],[usuarioSenha]
+				                            FROM [aquario].[amaro.victor].[UsuarioAcesso]
+				                            WHERE [idUsuario] = @idUsr
+			                            END
+	                            END";
 
                     SqlCommand com = new SqlCommand(query, con);
                     con.Open();
@@ -45,8 +59,7 @@ namespace ClimatizadorAquario2.Repository
                             {
                                 idUsuario = int.Parse(reader["idUsuario"].ToString()),
                                 usuarioNome = reader["usuarioNome"].ToString(),
-                                usuarioLogin = reader["usuarioLogin"].ToString(),
-                                usuarioSenha = reader["usuarioSenha"].ToString()
+                                usuarioLogin = reader["usuarioLogin"].ToString()
                             };
 
                             objRet = ret;

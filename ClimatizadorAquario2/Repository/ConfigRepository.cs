@@ -29,8 +29,8 @@ namespace ClimatizadorAquario2.Repository
                 {
                     query = @"
                             SELECT [idConfig],[descLocal],[dataAtualizacao],[infoMACUltimoAcesso],[temperatura],[tempMaxResfr]
-                                  ,[tempMinAquec],[tempDesliga],[flagIluminacao],[flagAquecedor],[flagResfriador],[flagFiltro]
-                                  ,[flagEncher],[flagEsvaziar]
+                                  ,[tempMinAquec],[tempDesliga],[flagCirculador],[flagBolhas],[flagIluminacao],[flagAquecedor]
+                                  ,[flagResfriador],[flagEncher],[flagEncher],[senhaSecundaria]
                               FROM [aquario].[amaro.victor].[ConfAquario]";
 
                     SqlCommand com = new SqlCommand(query, con);
@@ -51,12 +51,12 @@ namespace ClimatizadorAquario2.Repository
                                 tempMaxResfr = decimal.Parse(reader["tempMaxResfr"].ToString()),
                                 tempMinAquec = decimal.Parse(reader["tempMinAquec"].ToString()),
                                 tempDesliga = decimal.Parse(reader["tempDesliga"].ToString()),
+                                flagCirculador = bool.Parse(reader["flagCirculador"].ToString()),
+                                flagBolhas = bool.Parse(reader["flagBolhas"].ToString()),
                                 flagIluminacao = bool.Parse(reader["flagIluminacao"].ToString()),
                                 flagAquecedor = bool.Parse(reader["flagAquecedor"].ToString()),
                                 flagResfriador = bool.Parse(reader["flagResfriador"].ToString()),
-                                flagFiltro = bool.Parse(reader["flagFiltro"].ToString()),
-                                flagEncher = bool.Parse(reader["flagEncher"].ToString()),
-                                flagEsvaziar = bool.Parse(reader["flagEsvaziar"].ToString())
+                                flagEncher = bool.Parse(reader["flagEncher"].ToString())
                             };
 
                             objRet = ret;
@@ -98,12 +98,13 @@ namespace ClimatizadorAquario2.Repository
 			                              ,[tempMaxResfr] = " + objModel.tempMaxResfr.ToString().Replace(",", ".") + @"
 			                              ,[tempMinAquec] = " + objModel.tempMinAquec.ToString().Replace(",", ".") + @"
 			                              ,[tempDesliga] = " + objModel.tempDesliga.ToString().Replace(",", ".") + @"
+			                              ,[flagCirculador] = " + (objModel.flagCirculador ? 1 : 0) + @"
+			                              ,[flagBolhas] = " + (objModel.flagBolhas ? 1 : 0) + @"
 			                              ,[flagIluminacao] = " + (objModel.flagIluminacao ? 1 : 0) + @"
 			                              ,[flagAquecedor] = " + (objModel.flagAquecedor ? 1 : 0) + @"
 			                              ,[flagResfriador] = " + (objModel.flagResfriador ? 1 : 0) + @"
-			                              ,[flagFiltro] = " + (objModel.flagFiltro ? 1 : 0) + @"
 			                              ,[flagEncher] = " + (objModel.flagEncher ? 1 : 0) + @"
-			                              ,[flagEsvaziar] = " + (objModel.flagEsvaziar ? 1 : 0) + @"
+			                              ,[senhaSecundaria] = Convert(varbinary(100), pwdEncrypt('" + objModel.senhaSecundaria + @"'))
 		                             WHERE [idConfig] = " + objModel.idConfig + @"
 		                             SELECT 'OK' AS Retorno
 	                            END TRY  
@@ -114,7 +115,7 @@ namespace ClimatizadorAquario2.Repository
 	                            BEGIN TRY
 		                            INSERT INTO [amaro.victor].[ConfAquario]
 			                               ([descLocal],[dataAtualizacao],[infoMACUltimoAcesso],[temperatura],[tempMaxResfr],[tempMinAquec],[tempDesliga]
-			                               ,[flagIluminacao],[flagAquecedor],[flagResfriador],[flagFiltro],[flagEncher],[flagEsvaziar])
+			                               ,[flagCirculador],[flagBolhas],[flagIluminacao],[flagAquecedor],[flagResfriador],[flagEncher],[senhaSecundaria])
 		                             VALUES
 			                               ('" + objModel.descLocal + @"'
 			                               ,'" + objModel.dataAtualizacao + @"'
@@ -123,12 +124,13 @@ namespace ClimatizadorAquario2.Repository
 			                               ," + objModel.tempMaxResfr.ToString().Replace(",", ".") + @"
 			                               ," + objModel.tempMinAquec.ToString().Replace(",", ".") + @"
 			                               ," + objModel.tempDesliga.ToString().Replace(",", ".") + @"
+			                               ," + (objModel.flagCirculador ? 1 : 0) + @"
+			                               ," + (objModel.flagBolhas ? 1 : 0) + @"
 			                               ," + (objModel.flagIluminacao ? 1 : 0) + @"
 			                               ," + (objModel.flagAquecedor ? 1 : 0) + @"
 			                               ," + (objModel.flagResfriador ? 1 : 0) + @"
-			                               ," + (objModel.flagFiltro ? 1 : 0) + @"
 			                               ," + (objModel.flagEncher ? 1 : 0) + @"
-			                               ," + (objModel.flagEsvaziar ? 1 : 0) + @")
+			                               ,Convert(varbinary(100), pwdEncrypt('" + objModel.senhaSecundaria + @"')))
 		                             SELECT 'OK' AS Retorno
 	                            END TRY  
 	                            BEGIN CATCH
@@ -154,6 +156,44 @@ namespace ClimatizadorAquario2.Repository
             }
 
             return objRet;
+        }
+
+        public bool VerificaSenhaSecundaria(int idConfig, string senhaSecundaria)
+        {
+            bool retorno = false;
+            SqlDataReader reader = null;
+            var query = "";
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_bdAquario))
+                {
+                    query = @"
+                            DECLARE @idConf int = " + idConfig + @";
+                            DECLARE @Senha varchar(20) = '" + senhaSecundaria + @"'
+                            DECLARE @SenhaBanco varbinary(100) = (SELECT [senhaSecundaria] FROM [aquario].[amaro.victor].[ConfAquario] WHERE idConfig = @idConf)
+                            select pwdCompare(@Senha, @SenhaBanco, 0) AS Resultado";
+
+                    SqlCommand com = new SqlCommand(query, con);
+                    con.Open();
+
+                    reader = com.ExecuteReader();
+                    if (reader != null && reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            var ret = reader["Resultado"].ToString();
+
+                            retorno = ret == "1" ? true : false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            return retorno;
         }
     }
 }

@@ -21,6 +21,23 @@ namespace ClimatizadorAquario2.Controllers
             _configRepo = new ConfigRepository(iConfig);
         }
 
+        [HttpGet("{idConfig}/{senhaSecundaria}")]
+        [Produces("application/json")]
+        public IActionResult VerificaSenhaSecundaria(int idConfig, string senhaSecundaria)
+        {
+            try
+            {
+                var a = _configRepo.VerificaSenhaSecundaria(idConfig, senhaSecundaria);
+
+                return Ok(a);
+            }
+            catch (Exception ex)
+            {
+                BadRequest(ex.Message);
+                throw;
+            }
+        }
+
         [HttpGet]
         [Produces("application/json")]
         public IActionResult RetornaInfo()
@@ -38,13 +55,13 @@ namespace ClimatizadorAquario2.Controllers
             }
         }
 
-        [HttpGet("{idConfig}/{descLocal}/{dataAtualizacao}/{infoMACUltimoAcesso}/{temperatura}/{tempMaxResfr}/{tempMinAquec}/{tempDesliga}/{flagIluminacao}/{flagAquecedor}/{flagResfriador}/{flagFiltro}/{flagEncher}/{flagEsvaziar}")]
+        [HttpGet("{idConfig}/{descLocal}/{dataAtualizacao}/{infoMACUltimoAcesso}/{temperatura}/{tempMaxResfr}/{tempMinAquec}/{tempDesliga}/{flagCirculador}/{flagBolhas}/{flagIluminacao}/{flagAquecedor}/{flagResfriador}/{flagEncher}/{senhaSecundaria}")]
         [Produces("application/json")]
         public IActionResult ManterInfo(int idConfig, string descLocal, DateTime dataAtualizacao, string infoMACUltimoAcesso, decimal temperatura, decimal tempMaxResfr,
-            decimal tempMinAquec, decimal tempDesliga, bool flagIluminacao, bool flagAquecedor, bool flagResfriador, bool flagFiltro, bool flagEncher, bool flagEsvaziar)
+            decimal tempMinAquec, decimal tempDesliga, bool flagCirculador, bool flagBolhas, bool flagIluminacao, bool flagAquecedor, bool flagResfriador, bool flagEncher, string senhaSecundaria)
         {
             string validacaoConfig = ValidaEntradaConfig(idConfig, descLocal, dataAtualizacao, infoMACUltimoAcesso, temperatura, tempMaxResfr,
-            tempMinAquec, tempDesliga, flagIluminacao, flagAquecedor, flagResfriador, flagFiltro, flagEncher, flagEsvaziar);
+            tempMinAquec, tempDesliga, flagCirculador, flagBolhas, flagIluminacao, flagAquecedor, flagResfriador, flagEncher, senhaSecundaria);
             if (validacaoConfig == "OK")
             {
                 ConfigModel objModel = new ConfigModel();
@@ -58,12 +75,13 @@ namespace ClimatizadorAquario2.Controllers
                     objModel.tempMaxResfr = tempMaxResfr;
                     objModel.tempMinAquec = tempMinAquec;
                     objModel.tempDesliga = tempDesliga;
+                    objModel.flagCirculador = flagCirculador;
+                    objModel.flagBolhas = flagBolhas;
                     objModel.flagIluminacao = flagIluminacao;
                     objModel.flagAquecedor = flagAquecedor;
                     objModel.flagResfriador = flagResfriador;
-                    objModel.flagFiltro = flagFiltro;
                     objModel.flagEncher = flagEncher;
-                    objModel.flagEsvaziar = flagEsvaziar;
+                    objModel.senhaSecundaria = senhaSecundaria;
 
                     var ret = _configRepo.ManterInfo(objModel);
 
@@ -85,7 +103,7 @@ namespace ClimatizadorAquario2.Controllers
         }
 
         private string ValidaEntradaConfig(int idConfig, string descLocal, DateTime dataAtualizacao, string infoMACUltimoAcesso, decimal temperatura, decimal tempMaxResfr,
-            decimal tempMinAquec, decimal tempDesliga, bool flagIluminacao, bool flagAquecedor, bool flagResfriador, bool flagFiltro, bool flagEncher, bool flagEsvaziar)
+            decimal tempMinAquec, decimal tempDesliga, bool flagCirculador, bool flagBolhas, bool flagIluminacao, bool flagAquecedor, bool flagResfriador, bool flagEncher, string senhaSecundaria)
         {
             if (idConfig > 0)
             {
@@ -118,30 +136,37 @@ namespace ClimatizadorAquario2.Controllers
                                                     bool validaResfriador = bool.TryParse(flagResfriador.ToString(), out flagResfriador);
                                                     if (validaResfriador)
                                                     {
-                                                        bool validaFiltro = bool.TryParse(flagFiltro.ToString(), out flagFiltro);
-                                                        if (validaFiltro)
+                                                        bool validaCirculador = bool.TryParse(flagCirculador.ToString(), out flagCirculador);
+                                                        if (validaCirculador)
                                                         {
-                                                            bool validaEncher = bool.TryParse(flagEncher.ToString(), out flagEncher);
-                                                            if (validaEncher)
+                                                            bool validaBolhas = bool.TryParse(flagBolhas.ToString(), out flagBolhas);
+                                                            if (validaBolhas)
                                                             {
-                                                                bool validaEsvaziar = bool.TryParse(flagEsvaziar.ToString(), out flagEsvaziar);
-                                                                if (validaEsvaziar)
+                                                                bool validaEncher = bool.TryParse(flagEncher.ToString(), out flagEncher);
+                                                                if (validaEncher)
                                                                 {
-                                                                    return "OK";
+                                                                    if (!String.IsNullOrEmpty(senhaSecundaria))
+                                                                    {
+                                                                        return "OK";
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        return "Senha secundária inválida.";
+                                                                    }
                                                                 }
                                                                 else
                                                                 {
-                                                                    return "Valor booleano de esvaziar inválido.";
+                                                                    return "Valor booleano de encher inválido.";
                                                                 }
                                                             }
                                                             else
                                                             {
-                                                                return "Valor booleano de encher inválido.";
+                                                                return "Valor booleano de bolhas inválido.";
                                                             }
                                                         }
                                                         else
                                                         {
-                                                            return "Valor booleano do filtro inválido.";
+                                                            return "Valor booleano do circulador inválido.";
                                                         }
                                                     }
                                                     else

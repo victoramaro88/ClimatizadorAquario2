@@ -15,11 +15,12 @@ namespace ClimatizadorAquario2.Models
         public decimal tempMaxResfr { get; set; }
         public decimal tempMinAquec { get; set; }
         public decimal tempDesliga { get; set; }
+        public bool flagCirculador { get; set; }
+        public bool flagBolhas { get; set; }
         public bool flagIluminacao { get; set; }
         public bool flagAquecedor { get; set; }
         public bool flagResfriador { get; set; }
-        public bool flagFiltro { get; set; }
         public bool flagEncher { get; set; }
-        public bool flagEsvaziar { get; set; }
+        public string senhaSecundaria { get; set; }
     }
 }
