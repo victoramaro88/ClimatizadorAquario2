@@ -29,8 +29,8 @@ namespace ClimatizadorAquario2.Repository
                 {
                     query = @"
                             SELECT [idConfig],[descLocal],[dataAtualizacao],[infoMACUltimoAcesso],[temperatura],[tempMaxResfr]
-                                  ,[tempMinAquec],[tempDesliga],[flagCirculador],[flagBolhas],[flagIluminacao],[flagAquecedor]
-                                  ,[flagResfriador],[flagEncher],[flagEncher],[senhaSecundaria]
+                                  ,[tempMinAquec],[tempDesliga],[iluminHoraLiga],[iluminHoraDesliga],[flagCirculador],[flagBolhas],[flagIluminacao]
+                                  ,[flagAquecedor],[flagResfriador],[flagEncher],[flagEncher],[senhaSecundaria]
                               FROM [aquario].[amaro.victor].[ConfAquario]";
 
                     SqlCommand com = new SqlCommand(query, con);
@@ -51,6 +51,8 @@ namespace ClimatizadorAquario2.Repository
                                 tempMaxResfr = decimal.Parse(reader["tempMaxResfr"].ToString()),
                                 tempMinAquec = decimal.Parse(reader["tempMinAquec"].ToString()),
                                 tempDesliga = decimal.Parse(reader["tempDesliga"].ToString()),
+                                iluminHoraLiga = reader["iluminHoraLiga"].ToString(),
+                                iluminHoraDesliga = reader["iluminHoraDesliga"].ToString(),
                                 flagCirculador = bool.Parse(reader["flagCirculador"].ToString()),
                                 flagBolhas = bool.Parse(reader["flagBolhas"].ToString()),
                                 flagIluminacao = bool.Parse(reader["flagIluminacao"].ToString()),
@@ -70,6 +72,44 @@ namespace ClimatizadorAquario2.Repository
             }
 
             return objRet;
+        }
+
+        public string AtivaFuncoes(int idConf, string funcionalidade, bool flag)
+        {
+            string retorno = "";
+            SqlDataReader reader = null;
+            var query = "";
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_bdAquario))
+                {
+                    query = @"
+                                UPDATE [aquario].[amaro.victor].[ConfAquario]
+                                   SET [dataAtualizacao] = GETDATE()
+                                      ,[infoMACUltimoAcesso] = 'HOME'
+                                      ,[" + funcionalidade + @"] = " + (flag ? "1" : "0") + @"
+                                 WHERE idConfig = " + idConf + @"
+                                 SELECT 'OK' AS Retorno";
+
+                    SqlCommand com = new SqlCommand(query, con);
+                    con.Open();
+
+                    reader = com.ExecuteReader();
+                    if (reader != null && reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            retorno = reader["Retorno"].ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            return retorno;
         }
 
         public string ManterInfo(ConfigModel objModel)
@@ -98,6 +138,8 @@ namespace ClimatizadorAquario2.Repository
 			                              ,[tempMaxResfr] = " + objModel.tempMaxResfr.ToString().Replace(",", ".") + @"
 			                              ,[tempMinAquec] = " + objModel.tempMinAquec.ToString().Replace(",", ".") + @"
 			                              ,[tempDesliga] = " + objModel.tempDesliga.ToString().Replace(",", ".") + @"
+			                              ,[iluminHoraLiga] = '" + objModel.iluminHoraLiga + @"'
+			                              ,[iluminHoraDesliga] = '" + objModel.iluminHoraDesliga + @"'
 			                              ,[flagCirculador] = " + (objModel.flagCirculador ? 1 : 0) + @"
 			                              ,[flagBolhas] = " + (objModel.flagBolhas ? 1 : 0) + @"
 			                              ,[flagIluminacao] = " + (objModel.flagIluminacao ? 1 : 0) + @"
@@ -115,7 +157,8 @@ namespace ClimatizadorAquario2.Repository
 	                            BEGIN TRY
 		                            INSERT INTO [amaro.victor].[ConfAquario]
 			                               ([descLocal],[dataAtualizacao],[infoMACUltimoAcesso],[temperatura],[tempMaxResfr],[tempMinAquec],[tempDesliga]
-			                               ,[flagCirculador],[flagBolhas],[flagIluminacao],[flagAquecedor],[flagResfriador],[flagEncher],[senhaSecundaria])
+			                               ,[iluminHoraLiga],[iluminHoraDesliga],[flagCirculador],[flagBolhas],[flagIluminacao],[flagAquecedor]
+                                           ,[flagResfriador],[flagEncher],[senhaSecundaria])
 		                             VALUES
 			                               ('" + objModel.descLocal + @"'
 			                               ,'" + objModel.dataAtualizacao + @"'
@@ -124,6 +167,8 @@ namespace ClimatizadorAquario2.Repository
 			                               ," + objModel.tempMaxResfr.ToString().Replace(",", ".") + @"
 			                               ," + objModel.tempMinAquec.ToString().Replace(",", ".") + @"
 			                               ," + objModel.tempDesliga.ToString().Replace(",", ".") + @"
+			                               ,'" + objModel.iluminHoraLiga + @"'
+			                               ,'" + objModel.iluminHoraDesliga + @"'
 			                               ," + (objModel.flagCirculador ? 1 : 0) + @"
 			                               ," + (objModel.flagBolhas ? 1 : 0) + @"
 			                               ," + (objModel.flagIluminacao ? 1 : 0) + @"

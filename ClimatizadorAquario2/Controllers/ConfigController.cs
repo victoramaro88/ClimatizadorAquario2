@@ -55,13 +55,31 @@ namespace ClimatizadorAquario2.Controllers
             }
         }
 
-        [HttpGet("{idConfig}/{descLocal}/{dataAtualizacao}/{infoMACUltimoAcesso}/{temperatura}/{tempMaxResfr}/{tempMinAquec}/{tempDesliga}/{flagCirculador}/{flagBolhas}/{flagIluminacao}/{flagAquecedor}/{flagResfriador}/{flagEncher}/{senhaSecundaria}")]
+        [HttpGet("{idConf}/{funcionalidade}/{flag}")]
+        [Produces("application/json")]
+        public IActionResult AtivaFuncoes(int idConf, string funcionalidade, bool flag)
+        {
+            try
+            {
+                var a = _configRepo.AtivaFuncoes(idConf, funcionalidade, flag);
+
+                return Ok(a);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+        }
+
+        [HttpGet("{idConfig}/{descLocal}/{dataAtualizacao}/{infoMACUltimoAcesso}/{temperatura}/{tempMaxResfr}/{tempMinAquec}/{tempDesliga}/{iluminHoraLiga}/{iluminHoraDesliga}/{flagCirculador}/{flagBolhas}/{flagIluminacao}/{flagAquecedor}/{flagResfriador}/{flagEncher}/{senhaSecundaria}")]
         [Produces("application/json")]
         public IActionResult ManterInfo(int idConfig, string descLocal, DateTime dataAtualizacao, string infoMACUltimoAcesso, decimal temperatura, decimal tempMaxResfr,
-            decimal tempMinAquec, decimal tempDesliga, bool flagCirculador, bool flagBolhas, bool flagIluminacao, bool flagAquecedor, bool flagResfriador, bool flagEncher, string senhaSecundaria)
+            decimal tempMinAquec, decimal tempDesliga, string iluminHoraLiga, string iluminHoraDesliga, bool flagCirculador, bool flagBolhas, bool flagIluminacao, 
+            bool flagAquecedor, bool flagResfriador, bool flagEncher, string senhaSecundaria)
         {
             string validacaoConfig = ValidaEntradaConfig(idConfig, descLocal, dataAtualizacao, infoMACUltimoAcesso, temperatura, tempMaxResfr,
-            tempMinAquec, tempDesliga, flagCirculador, flagBolhas, flagIluminacao, flagAquecedor, flagResfriador, flagEncher, senhaSecundaria);
+            tempMinAquec, tempDesliga, iluminHoraLiga, iluminHoraDesliga, flagCirculador, flagBolhas, flagIluminacao, flagAquecedor, flagResfriador, flagEncher, senhaSecundaria);
             if (validacaoConfig == "OK")
             {
                 ConfigModel objModel = new ConfigModel();
@@ -75,6 +93,8 @@ namespace ClimatizadorAquario2.Controllers
                     objModel.tempMaxResfr = tempMaxResfr;
                     objModel.tempMinAquec = tempMinAquec;
                     objModel.tempDesliga = tempDesliga;
+                    objModel.iluminHoraLiga = iluminHoraLiga;
+                    objModel.iluminHoraDesliga = iluminHoraDesliga;
                     objModel.flagCirculador = flagCirculador;
                     objModel.flagBolhas = flagBolhas;
                     objModel.flagIluminacao = flagIluminacao;
@@ -102,8 +122,10 @@ namespace ClimatizadorAquario2.Controllers
             }
         }
 
+        [NonAction]
         private string ValidaEntradaConfig(int idConfig, string descLocal, DateTime dataAtualizacao, string infoMACUltimoAcesso, decimal temperatura, decimal tempMaxResfr,
-            decimal tempMinAquec, decimal tempDesliga, bool flagCirculador, bool flagBolhas, bool flagIluminacao, bool flagAquecedor, bool flagResfriador, bool flagEncher, string senhaSecundaria)
+            decimal tempMinAquec, decimal tempDesliga, string iluminHoraLiga, string iluminHoraDesliga, bool flagCirculador, bool flagBolhas, bool flagIluminacao, 
+            bool flagAquecedor, bool flagResfriador, bool flagEncher, string senhaSecundaria)
         {
             if (idConfig > 0)
             {
@@ -147,7 +169,21 @@ namespace ClimatizadorAquario2.Controllers
                                                                 {
                                                                     if (!String.IsNullOrEmpty(senhaSecundaria))
                                                                     {
-                                                                        return "OK";
+                                                                        if (!String.IsNullOrEmpty(iluminHoraLiga))
+                                                                        {
+                                                                            if (!String.IsNullOrEmpty(iluminHoraDesliga))
+                                                                            {
+                                                                                return "OK";
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                return "Hora de desligar inválida.";
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            return "Hora de ligar inválida.";
+                                                                        }
                                                                     }
                                                                     else
                                                                     {
