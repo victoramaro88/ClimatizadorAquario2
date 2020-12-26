@@ -72,6 +72,23 @@ namespace ClimatizadorAquario2.Controllers
             }
         }
 
+        [HttpGet("{idConfig}/{tempMaxResfr}/{tempMinAquec}/{tempDesliga}/{iluminHoraLiga}/{iluminHoraDesliga}")]
+        [Produces("application/json")]
+        public IActionResult ManterOpcoes(int idConfig, decimal tempMaxResfr, decimal tempMinAquec, decimal tempDesliga, string iluminHoraLiga, string iluminHoraDesliga)
+        {
+            try
+            {
+                var a = _configRepo.ManterOpcoes(idConfig, tempMaxResfr, tempMinAquec, tempDesliga, iluminHoraLiga, iluminHoraDesliga);
+
+                return Ok(a);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+        }
+
         [HttpGet("{idConfig}/{descLocal}/{dataAtualizacao}/{infoMACUltimoAcesso}/{temperatura}/{tempMaxResfr}/{tempMinAquec}/{tempDesliga}/{iluminHoraLiga}/{iluminHoraDesliga}/{flagCirculador}/{flagBolhas}/{flagIluminacao}/{flagAquecedor}/{flagResfriador}/{flagEncher}/{senhaSecundaria}")]
         [Produces("application/json")]
         public IActionResult ManterInfo(int idConfig, string descLocal, DateTime dataAtualizacao, string infoMACUltimoAcesso, decimal temperatura, decimal tempMaxResfr,

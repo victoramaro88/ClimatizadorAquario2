@@ -203,6 +203,45 @@ namespace ClimatizadorAquario2.Repository
             return objRet;
         }
 
+        public string ManterOpcoes(int idConfig, decimal tempMaxResfr, decimal tempMinAquec, decimal tempDesliga, string iluminHoraLiga, string iluminHoraDesliga)
+        {
+            string retorno = "";
+            SqlDataReader reader = null;
+            var query = "";
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_bdAquario))
+                {
+                    query = @"UPDATE [amaro.victor].[ConfAquario]
+                               SET [tempMaxResfr] = " + tempMaxResfr.ToString().Replace(",",".") + @"
+                                  ,[tempMinAquec] = " + tempMinAquec.ToString().Replace(",", ".") + @"
+                                  ,[tempDesliga] = " + tempDesliga.ToString().Replace(",", ".") + @"
+                                  ,[iluminHoraLiga] = '" + iluminHoraLiga + @"'
+                                  ,[iluminHoraDesliga] = '" + iluminHoraDesliga + @"'
+                             WHERE [idConfig] = " + idConfig + @"
+                             SELECT 'OK' AS Retorno";
+
+                    SqlCommand com = new SqlCommand(query, con);
+                    con.Open();
+
+                    reader = com.ExecuteReader();
+                    if (reader != null && reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            retorno = reader["Retorno"].ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            return retorno;
+        }
+
         public bool VerificaSenhaSecundaria(int idConfig, string senhaSecundaria)
         {
             bool retorno = false;
