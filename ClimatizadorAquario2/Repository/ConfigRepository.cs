@@ -203,6 +203,41 @@ namespace ClimatizadorAquario2.Repository
             return objRet;
         }
 
+        public string EnviaTemperatura(int idConf, decimal temp)
+        {
+            string retorno = "";
+            SqlDataReader reader = null;
+            var query = "";
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_bdAquario))
+                {
+                    query = @"UPDATE [aquario].[amaro.victor].[ConfAquario]
+                               SET [temperatura] = " + temp.ToString().Replace(",", ".") + @"
+                             WHERE [idConfig] = " + idConf + @"
+                             SELECT 'OK' AS Retorno";
+
+                    SqlCommand com = new SqlCommand(query, con);
+                    con.Open();
+
+                    reader = com.ExecuteReader();
+                    if (reader != null && reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            retorno = reader["Retorno"].ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            return retorno;
+        }
+
         public string ManterOpcoes(int idConfig, decimal tempMaxResfr, decimal tempMinAquec, decimal tempDesliga, string iluminHoraLiga, string iluminHoraDesliga)
         {
             string retorno = "";

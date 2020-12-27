@@ -72,6 +72,23 @@ namespace ClimatizadorAquario2.Controllers
             }
         }
 
+        [HttpGet("{idConf}/{temp}")]
+        [Produces("application/json")]
+        public IActionResult EnviaTemperatura(int idConf, decimal temp)
+        {
+            try
+            {
+                var a = _configRepo.EnviaTemperatura(idConf, temp);
+
+                return Ok(a);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+        }
+
         [HttpGet("{idConfig}/{tempMaxResfr}/{tempMinAquec}/{tempDesliga}/{iluminHoraLiga}/{iluminHoraDesliga}")]
         [Produces("application/json")]
         public IActionResult ManterOpcoes(int idConfig, decimal tempMaxResfr, decimal tempMinAquec, decimal tempDesliga, string iluminHoraLiga, string iluminHoraDesliga)
