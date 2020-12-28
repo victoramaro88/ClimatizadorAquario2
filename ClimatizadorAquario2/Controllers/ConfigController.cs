@@ -72,13 +72,13 @@ namespace ClimatizadorAquario2.Controllers
             }
         }
 
-        [HttpGet("{idConf}/{temp}")]
+        [HttpGet("{idConf}/{temp}/{nivelAgua}")]
         [Produces("application/json")]
-        public IActionResult EnviaTemperatura(int idConf, decimal temp)
+        public IActionResult EnviaTempENivelAgua(int idConf, decimal temp, bool nivelAgua)
         {
             try
             {
-                var a = _configRepo.EnviaTemperatura(idConf, temp);
+                var a = _configRepo.EnviaTempENivelAgua(idConf, temp, nivelAgua);
 
                 return Ok(a);
             }
@@ -106,14 +106,14 @@ namespace ClimatizadorAquario2.Controllers
             }
         }
 
-        [HttpGet("{idConfig}/{descLocal}/{dataAtualizacao}/{infoMACUltimoAcesso}/{temperatura}/{tempMaxResfr}/{tempMinAquec}/{tempDesliga}/{iluminHoraLiga}/{iluminHoraDesliga}/{flagCirculador}/{flagBolhas}/{flagIluminacao}/{flagAquecedor}/{flagResfriador}/{flagEncher}/{senhaSecundaria}")]
+        [HttpGet("{idConfig}/{descLocal}/{dataAtualizacao}/{infoMACUltimoAcesso}/{temperatura}/{tempMaxResfr}/{tempMinAquec}/{tempDesliga}/{iluminHoraLiga}/{iluminHoraDesliga}/{flagNivelAgua}/{flagCirculador}/{flagBolhas}/{flagIluminacao}/{flagAquecedor}/{flagResfriador}/{flagEncher}/{senhaSecundaria}")]
         [Produces("application/json")]
         public IActionResult ManterInfo(int idConfig, string descLocal, DateTime dataAtualizacao, string infoMACUltimoAcesso, decimal temperatura, decimal tempMaxResfr,
-            decimal tempMinAquec, decimal tempDesliga, string iluminHoraLiga, string iluminHoraDesliga, bool flagCirculador, bool flagBolhas, bool flagIluminacao, 
+            decimal tempMinAquec, decimal tempDesliga, string iluminHoraLiga, string iluminHoraDesliga, bool flagNivelAgua, bool flagCirculador, bool flagBolhas, bool flagIluminacao,
             bool flagAquecedor, bool flagResfriador, bool flagEncher, string senhaSecundaria)
         {
             string validacaoConfig = ValidaEntradaConfig(idConfig, descLocal, dataAtualizacao, infoMACUltimoAcesso, temperatura, tempMaxResfr,
-            tempMinAquec, tempDesliga, iluminHoraLiga, iluminHoraDesliga, flagCirculador, flagBolhas, flagIluminacao, flagAquecedor, flagResfriador, flagEncher, senhaSecundaria);
+            tempMinAquec, tempDesliga, iluminHoraLiga, iluminHoraDesliga, flagNivelAgua, flagCirculador, flagBolhas, flagIluminacao, flagAquecedor, flagResfriador, flagEncher, senhaSecundaria);
             if (validacaoConfig == "OK")
             {
                 ConfigModel objModel = new ConfigModel();
@@ -129,6 +129,7 @@ namespace ClimatizadorAquario2.Controllers
                     objModel.tempDesliga = tempDesliga;
                     objModel.iluminHoraLiga = iluminHoraLiga;
                     objModel.iluminHoraDesliga = iluminHoraDesliga;
+                    objModel.flagNivelAgua = flagNivelAgua;
                     objModel.flagCirculador = flagCirculador;
                     objModel.flagBolhas = flagBolhas;
                     objModel.flagIluminacao = flagIluminacao;
@@ -158,7 +159,7 @@ namespace ClimatizadorAquario2.Controllers
 
         [NonAction]
         private string ValidaEntradaConfig(int idConfig, string descLocal, DateTime dataAtualizacao, string infoMACUltimoAcesso, decimal temperatura, decimal tempMaxResfr,
-            decimal tempMinAquec, decimal tempDesliga, string iluminHoraLiga, string iluminHoraDesliga, bool flagCirculador, bool flagBolhas, bool flagIluminacao, 
+            decimal tempMinAquec, decimal tempDesliga, string iluminHoraLiga, string iluminHoraDesliga, bool flagNivelAgua, bool flagCirculador, bool flagBolhas, bool flagIluminacao,
             bool flagAquecedor, bool flagResfriador, bool flagEncher, string senhaSecundaria)
         {
             if (idConfig > 0)
@@ -186,72 +187,80 @@ namespace ClimatizadorAquario2.Controllers
                                             bool validaIluminacao = bool.TryParse(flagIluminacao.ToString(), out flagIluminacao);
                                             if (validaIluminacao)
                                             {
-                                                bool validaAquecedor = bool.TryParse(flagAquecedor.ToString(), out flagAquecedor);
-                                                if (validaAquecedor)
+                                                bool validaflagNivelAgua = bool.TryParse(flagNivelAgua.ToString(), out flagNivelAgua);
+                                                if (validaflagNivelAgua)
                                                 {
-                                                    bool validaResfriador = bool.TryParse(flagResfriador.ToString(), out flagResfriador);
-                                                    if (validaResfriador)
+                                                    bool validaAquecedor = bool.TryParse(flagAquecedor.ToString(), out flagAquecedor);
+                                                    if (validaAquecedor)
                                                     {
-                                                        bool validaCirculador = bool.TryParse(flagCirculador.ToString(), out flagCirculador);
-                                                        if (validaCirculador)
+                                                        bool validaResfriador = bool.TryParse(flagResfriador.ToString(), out flagResfriador);
+                                                        if (validaResfriador)
                                                         {
-                                                            bool validaBolhas = bool.TryParse(flagBolhas.ToString(), out flagBolhas);
-                                                            if (validaBolhas)
+                                                            bool validaCirculador = bool.TryParse(flagCirculador.ToString(), out flagCirculador);
+                                                            if (validaCirculador)
                                                             {
-                                                                bool validaEncher = bool.TryParse(flagEncher.ToString(), out flagEncher);
-                                                                if (validaEncher)
+                                                                bool validaBolhas = bool.TryParse(flagBolhas.ToString(), out flagBolhas);
+                                                                if (validaBolhas)
                                                                 {
-                                                                    if (!String.IsNullOrEmpty(senhaSecundaria))
+                                                                    bool validaEncher = bool.TryParse(flagEncher.ToString(), out flagEncher);
+                                                                    if (validaEncher)
                                                                     {
-                                                                        if (!String.IsNullOrEmpty(iluminHoraLiga))
+                                                                        if (!String.IsNullOrEmpty(senhaSecundaria))
                                                                         {
-                                                                            if (!String.IsNullOrEmpty(iluminHoraDesliga))
+                                                                            if (!String.IsNullOrEmpty(iluminHoraLiga))
                                                                             {
-                                                                                return "OK";
+                                                                                if (!String.IsNullOrEmpty(iluminHoraDesliga))
+                                                                                {
+                                                                                    return "OK";
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    return "Hora de desligar inválida.";
+                                                                                }
                                                                             }
                                                                             else
                                                                             {
-                                                                                return "Hora de desligar inválida.";
+                                                                                return "Hora de ligar inválida.";
                                                                             }
                                                                         }
                                                                         else
                                                                         {
-                                                                            return "Hora de ligar inválida.";
+                                                                            return "Senha secundária inválida.";
                                                                         }
                                                                     }
                                                                     else
                                                                     {
-                                                                        return "Senha secundária inválida.";
+                                                                        return "Valor booleano de encher inválido.";
                                                                     }
                                                                 }
                                                                 else
                                                                 {
-                                                                    return "Valor booleano de encher inválido.";
+                                                                    return "Valor booleano de bolhas inválido.";
                                                                 }
                                                             }
                                                             else
                                                             {
-                                                                return "Valor booleano de bolhas inválido.";
+                                                                return "Valor booleano do circulador inválido.";
                                                             }
                                                         }
                                                         else
                                                         {
-                                                            return "Valor booleano do circulador inválido.";
+                                                            return "Valor booleano do resfriador inválido.";
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        return "Valor booleano do resfriador inválido.";
+                                                        return "Valor booleano do aquecedor inválido.";
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    return "Valor booleano do aquecedor inválido.";
+                                                    return "Valor booleano da iluminação inválido.";
                                                 }
                                             }
                                             else
                                             {
-                                                return "Valor booleano da iluminação inválido.";
+                                                return "Valor booleano do nível de água inválido.";
                                             }
                                         }
                                         else

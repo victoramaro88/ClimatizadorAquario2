@@ -29,7 +29,7 @@ namespace ClimatizadorAquario2.Repository
                 {
                     query = @"
                             SELECT [idConfig],[descLocal],[dataAtualizacao],[infoMACUltimoAcesso],[temperatura],[tempMaxResfr]
-                                  ,[tempMinAquec],[tempDesliga],[iluminHoraLiga],[iluminHoraDesliga],[flagCirculador],[flagBolhas],[flagIluminacao]
+                                  ,[tempMinAquec],[tempDesliga],[iluminHoraLiga],[iluminHoraDesliga],[flagNivelAgua],[flagCirculador],[flagBolhas],[flagIluminacao]
                                   ,[flagAquecedor],[flagResfriador],[flagEncher],[flagEncher],[senhaSecundaria]
                               FROM [aquario].[amaro.victor].[ConfAquario]";
 
@@ -53,6 +53,7 @@ namespace ClimatizadorAquario2.Repository
                                 tempDesliga = decimal.Parse(reader["tempDesliga"].ToString()),
                                 iluminHoraLiga = reader["iluminHoraLiga"].ToString(),
                                 iluminHoraDesliga = reader["iluminHoraDesliga"].ToString(),
+                                flagNivelAgua = bool.Parse(reader["flagNivelAgua"].ToString()),
                                 flagCirculador = bool.Parse(reader["flagCirculador"].ToString()),
                                 flagBolhas = bool.Parse(reader["flagBolhas"].ToString()),
                                 flagIluminacao = bool.Parse(reader["flagIluminacao"].ToString()),
@@ -140,6 +141,7 @@ namespace ClimatizadorAquario2.Repository
 			                              ,[tempDesliga] = " + objModel.tempDesliga.ToString().Replace(",", ".") + @"
 			                              ,[iluminHoraLiga] = '" + objModel.iluminHoraLiga + @"'
 			                              ,[iluminHoraDesliga] = '" + objModel.iluminHoraDesliga + @"'
+			                              ,[flagNivelAgua] = " + (objModel.flagNivelAgua ? 1 : 0) + @"
 			                              ,[flagCirculador] = " + (objModel.flagCirculador ? 1 : 0) + @"
 			                              ,[flagBolhas] = " + (objModel.flagBolhas ? 1 : 0) + @"
 			                              ,[flagIluminacao] = " + (objModel.flagIluminacao ? 1 : 0) + @"
@@ -169,6 +171,7 @@ namespace ClimatizadorAquario2.Repository
 			                               ," + objModel.tempDesliga.ToString().Replace(",", ".") + @"
 			                               ,'" + objModel.iluminHoraLiga + @"'
 			                               ,'" + objModel.iluminHoraDesliga + @"'
+			                               ," + (objModel.flagNivelAgua ? 1 : 0) + @"
 			                               ," + (objModel.flagCirculador ? 1 : 0) + @"
 			                               ," + (objModel.flagBolhas ? 1 : 0) + @"
 			                               ," + (objModel.flagIluminacao ? 1 : 0) + @"
@@ -203,7 +206,7 @@ namespace ClimatizadorAquario2.Repository
             return objRet;
         }
 
-        public string EnviaTemperatura(int idConf, decimal temp)
+        public string EnviaTempENivelAgua(int idConf, decimal temp, bool nivelAgua)
         {
             string retorno = "";
             SqlDataReader reader = null;
@@ -214,6 +217,8 @@ namespace ClimatizadorAquario2.Repository
                 {
                     query = @"UPDATE [aquario].[amaro.victor].[ConfAquario]
                                SET [temperatura] = " + temp.ToString().Replace(",", ".") + @"
+                                   ,[dataAtualizacao] = (SELECT GETDATE())
+			                       ,[flagNivelAgua] = " + (nivelAgua ? 1 : 0) + @"
                              WHERE [idConfig] = " + idConf + @"
                              SELECT 'OK' AS Retorno";
 
@@ -248,7 +253,8 @@ namespace ClimatizadorAquario2.Repository
                 using (SqlConnection con = new SqlConnection(_bdAquario))
                 {
                     query = @"UPDATE [amaro.victor].[ConfAquario]
-                               SET [tempMaxResfr] = " + tempMaxResfr.ToString().Replace(",",".") + @"
+                               SET [dataAtualizacao] = (SELECT GETDATE())
+                                  ,[tempMaxResfr] = " + tempMaxResfr.ToString().Replace(",",".") + @"
                                   ,[tempMinAquec] = " + tempMinAquec.ToString().Replace(",", ".") + @"
                                   ,[tempDesliga] = " + tempDesliga.ToString().Replace(",", ".") + @"
                                   ,[iluminHoraLiga] = '" + iluminHoraLiga + @"'

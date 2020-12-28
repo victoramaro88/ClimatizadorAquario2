@@ -17,6 +17,7 @@ namespace ClimatizadorAquario2.Models
         public decimal tempDesliga { get; set; }
         public string iluminHoraLiga { get; set; }
         public string iluminHoraDesliga { get; set; }
+        public bool flagNivelAgua { get; set; }
         public bool flagCirculador { get; set; }
         public bool flagBolhas { get; set; }
         public bool flagIluminacao { get; set; }
