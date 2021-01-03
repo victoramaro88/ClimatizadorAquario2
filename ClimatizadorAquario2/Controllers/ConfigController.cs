@@ -44,9 +44,10 @@ namespace ClimatizadorAquario2.Controllers
         {
             try
             {
-                var a = _configRepo.RetornaInfo();
-
-                return Ok(a);
+                var pesquisa = _configRepo.RetornaInfo();
+                ConfiguraStatusParametros(pesquisa);
+                var novaPesquisa = _configRepo.RetornaInfo();
+                return Ok(novaPesquisa);
             }
             catch (Exception ex)
             {
@@ -303,5 +304,56 @@ namespace ClimatizadorAquario2.Controllers
                 return "Id de Configuração inválido.";
             }
         }
+
+        [NonAction]
+        private void ConfiguraStatusParametros(ConfigModel configModel)
+        {
+            if (configModel != null)
+            {
+                #region Verificando a Temperatura
+                // ->Acima do permitido
+                if (configModel.temperatura > configModel.tempMaxResfr)
+                {
+                    AtivaFuncoes(configModel.idConfig, "flagResfriador", true);
+                    AtivaFuncoes(configModel.idConfig, "flagAquecedor", false);
+                    configModel.flagResfriador = true;
+                    configModel.flagAquecedor = false;
+                }
+
+                // ->Abaixo do permitido
+                if (configModel.temperatura < configModel.tempMinAquec)
+                {
+                    AtivaFuncoes(configModel.idConfig, "flagAquecedor", true);
+                    AtivaFuncoes(configModel.idConfig, "flagResfriador", false);
+                    configModel.flagAquecedor = true;
+                    configModel.flagResfriador = false;
+                }
+
+                // ->Quando atinge a temperatura para desligar
+                if ((configModel.temperatura == configModel.tempDesliga || configModel.temperatura >= configModel.tempDesliga + Decimal.Parse("1"))
+                    || (configModel.temperatura == configModel.tempDesliga || configModel.temperatura <= configModel.tempDesliga - Decimal.Parse("1")))
+                {
+                    AtivaFuncoes(configModel.idConfig, "flagAquecedor", false);
+                    AtivaFuncoes(configModel.idConfig, "flagResfriador", false);
+                    configModel.flagAquecedor = false;
+                    configModel.flagResfriador = false;
+                }
+                #endregion
+
+                #region Verificando horário para ligar/desligar luzes
+                if (configModel.iluminHoraLiga == DateTime.Now.ToShortTimeString())
+                {
+                    AtivaFuncoes(configModel.idConfig, "flagIluminacao", true);
+                    configModel.flagIluminacao = true;
+                }
+                if (configModel.iluminHoraDesliga == DateTime.Now.ToShortTimeString())
+                {
+                    AtivaFuncoes(configModel.idConfig, "flagIluminacao", false);
+                    configModel.flagIluminacao = false;
+                }
+                #endregion
+            }
+        }
+
     }
 }
