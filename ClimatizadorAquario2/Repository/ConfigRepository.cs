@@ -29,8 +29,9 @@ namespace ClimatizadorAquario2.Repository
                 {
                     query = @"
                             SELECT [idConfig],[descLocal],[dataAtualizacao],[infoMACUltimoAcesso],[temperatura],[tempMaxResfr]
-                                  ,[tempMinAquec],[tempDesliga],[iluminHoraLiga],[iluminHoraDesliga],[flagNivelAgua],[flagCirculador],[flagBolhas],[flagIluminacao]
-                                  ,[flagAquecedor],[flagResfriador],[flagEncher],[flagEncher],[senhaSecundaria]
+                                  ,[tempMinAquec],[tempDesliga],[iluminHoraLiga],[iluminHoraDesliga],[flagManual],[flagNivelAgua]
+                                  ,[flagCirculador],[flagBolhas],[flagIluminacao],[flagAquecedor],[flagResfriador],[flagEncher]
+                                  ,[flagEncher],[senhaSecundaria]
                               FROM [aquario].[amaro.victor].[ConfAquario]";
 
                     SqlCommand com = new SqlCommand(query, con);
@@ -53,6 +54,7 @@ namespace ClimatizadorAquario2.Repository
                                 tempDesliga = decimal.Parse(reader["tempDesliga"].ToString()),
                                 iluminHoraLiga = reader["iluminHoraLiga"].ToString(),
                                 iluminHoraDesliga = reader["iluminHoraDesliga"].ToString(),
+                                flagManual = bool.Parse(reader["flagManual"].ToString()),
                                 flagNivelAgua = bool.Parse(reader["flagNivelAgua"].ToString()),
                                 flagCirculador = bool.Parse(reader["flagCirculador"].ToString()),
                                 flagBolhas = bool.Parse(reader["flagBolhas"].ToString()),
@@ -141,6 +143,7 @@ namespace ClimatizadorAquario2.Repository
 			                              ,[tempDesliga] = " + objModel.tempDesliga.ToString().Replace(",", ".") + @"
 			                              ,[iluminHoraLiga] = '" + objModel.iluminHoraLiga + @"'
 			                              ,[iluminHoraDesliga] = '" + objModel.iluminHoraDesliga + @"'
+			                              ,[flagManual] = " + (objModel.flagManual ? 1 : 0) + @"
 			                              ,[flagNivelAgua] = " + (objModel.flagNivelAgua ? 1 : 0) + @"
 			                              ,[flagCirculador] = " + (objModel.flagCirculador ? 1 : 0) + @"
 			                              ,[flagBolhas] = " + (objModel.flagBolhas ? 1 : 0) + @"
@@ -171,6 +174,7 @@ namespace ClimatizadorAquario2.Repository
 			                               ," + objModel.tempDesliga.ToString().Replace(",", ".") + @"
 			                               ,'" + objModel.iluminHoraLiga + @"'
 			                               ,'" + objModel.iluminHoraDesliga + @"'
+			                               ," + (objModel.flagManual ? 1 : 0) + @"
 			                               ," + (objModel.flagNivelAgua ? 1 : 0) + @"
 			                               ," + (objModel.flagCirculador ? 1 : 0) + @"
 			                               ," + (objModel.flagBolhas ? 1 : 0) + @"
