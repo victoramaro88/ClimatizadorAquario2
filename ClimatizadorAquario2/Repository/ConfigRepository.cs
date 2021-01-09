@@ -86,10 +86,16 @@ namespace ClimatizadorAquario2.Repository
             {
                 using (SqlConnection con = new SqlConnection(_bdAquario))
                 {
+                    //query = @"
+                    //            UPDATE [aquario].[amaro.victor].[ConfAquario]
+                    //               SET [dataAtualizacao] = GETDATE()
+                    //                  ,[infoMACUltimoAcesso] = 'HOME'
+                    //                  ,[" + funcionalidade + @"] = " + (flag ? "1" : "0") + @"
+                    //             WHERE idConfig = " + idConf + @"
+                    //             SELECT 'OK' AS Retorno";
                     query = @"
                                 UPDATE [aquario].[amaro.victor].[ConfAquario]
-                                   SET [dataAtualizacao] = GETDATE()
-                                      ,[infoMACUltimoAcesso] = 'HOME'
+                                   SET [infoMACUltimoAcesso] = 'HOME'
                                       ,[" + funcionalidade + @"] = " + (flag ? "1" : "0") + @"
                                  WHERE idConfig = " + idConf + @"
                                  SELECT 'OK' AS Retorno";
@@ -256,9 +262,17 @@ namespace ClimatizadorAquario2.Repository
             {
                 using (SqlConnection con = new SqlConnection(_bdAquario))
                 {
+                    //query = @"UPDATE [amaro.victor].[ConfAquario]
+                    //           SET [dataAtualizacao] = (SELECT GETDATE())
+                    //              ,[tempMaxResfr] = " + tempMaxResfr.ToString().Replace(",", ".") + @"
+                    //              ,[tempMinAquec] = " + tempMinAquec.ToString().Replace(",", ".") + @"
+                    //              ,[tempDesliga] = " + tempDesliga.ToString().Replace(",", ".") + @"
+                    //              ,[iluminHoraLiga] = '" + iluminHoraLiga + @"'
+                    //              ,[iluminHoraDesliga] = '" + iluminHoraDesliga + @"'
+                    //         WHERE [idConfig] = " + idConfig + @"
+                    //         SELECT 'OK' AS Retorno";
                     query = @"UPDATE [amaro.victor].[ConfAquario]
-                               SET [dataAtualizacao] = (SELECT GETDATE())
-                                  ,[tempMaxResfr] = " + tempMaxResfr.ToString().Replace(",",".") + @"
+                               SET [tempMaxResfr] = " + tempMaxResfr.ToString().Replace(",", ".") + @"
                                   ,[tempMinAquec] = " + tempMinAquec.ToString().Replace(",", ".") + @"
                                   ,[tempDesliga] = " + tempDesliga.ToString().Replace(",", ".") + @"
                                   ,[iluminHoraLiga] = '" + iluminHoraLiga + @"'
