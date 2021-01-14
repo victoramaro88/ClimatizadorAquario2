@@ -110,7 +110,7 @@ namespace ClimatizadorAquario2.Controllers
         [HttpGet("{idConfig}/{descLocal}/{dataAtualizacao}/{infoMACUltimoAcesso}/{temperatura}/{tempMaxResfr}/{tempMinAquec}/{tempDesliga}/{iluminHoraLiga}/{iluminHoraDesliga}/{flagManual}/{flagNivelAgua}/{flagCirculador}/{flagBolhas}/{flagIluminacao}/{flagAquecedor}/{flagResfriador}/{flagEncher}/{senhaSecundaria}")]
         [Produces("application/json")]
         public IActionResult ManterInfo(int idConfig, string descLocal, DateTime dataAtualizacao, string infoMACUltimoAcesso, decimal temperatura, decimal tempMaxResfr,
-            decimal tempMinAquec, decimal tempDesliga, string iluminHoraLiga, string iluminHoraDesliga, bool flagManual, bool flagNivelAgua, bool flagCirculador, bool flagBolhas, 
+            decimal tempMinAquec, decimal tempDesliga, string iluminHoraLiga, string iluminHoraDesliga, bool flagManual, bool flagNivelAgua, bool flagCirculador, bool flagBolhas,
             bool flagIluminacao, bool flagAquecedor, bool flagResfriador, bool flagEncher, string senhaSecundaria)
         {
             string validacaoConfig = ValidaEntradaConfig(idConfig, descLocal, dataAtualizacao, infoMACUltimoAcesso, temperatura, tempMaxResfr,
@@ -352,6 +352,10 @@ namespace ClimatizadorAquario2.Controllers
                 #endregion
 
                 #region Verificando horário para ligar/desligar luzes
+                DateTime horaLiga = new DateTime(2021, 1, 14, 6, 0, 0);
+                DateTime horaDesLiga = new DateTime(2021, 1, 14, 18, 32, 0);
+                DateTime horaAgora = DateTime.Now;
+
                 if (configModel.iluminHoraLiga == DateTime.Now.ToShortTimeString())
                 {
                     AtivaFuncoes(configModel.idConfig, "flagIluminacao", true);
