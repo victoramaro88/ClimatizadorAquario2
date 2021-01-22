@@ -352,20 +352,22 @@ namespace ClimatizadorAquario2.Controllers
                 #endregion
 
                 #region Verificando horário para ligar/desligar luzes
-                DateTime horaLiga = new DateTime(2021, 1, 14, 6, 0, 0);
-                DateTime horaDesLiga = new DateTime(2021, 1, 14, 18, 32, 0);
+                DateTime horaLiga = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, Int32.Parse(configModel.iluminHoraLiga.Substring(0, 2)), Int32.Parse(configModel.iluminHoraLiga.Substring(3)), 0);
+                DateTime horaDesLiga = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, Int32.Parse(configModel.iluminHoraDesliga.Substring(0, 2)), Int32.Parse(configModel.iluminHoraDesliga.Substring(3)), 0);
                 DateTime horaAgora = DateTime.Now;
 
-                if (configModel.iluminHoraLiga == DateTime.Now.ToShortTimeString())
+                bool flagLiga = false;
+                if (horaLiga <= horaAgora && horaAgora <= horaDesLiga)
                 {
-                    AtivaFuncoes(configModel.idConfig, "flagIluminacao", true);
-                    configModel.flagIluminacao = true;
+                    flagLiga = true;
                 }
-                if (configModel.iluminHoraDesliga == DateTime.Now.ToShortTimeString())
+                else
                 {
-                    AtivaFuncoes(configModel.idConfig, "flagIluminacao", false);
-                    configModel.flagIluminacao = false;
+                    flagLiga = false;
                 }
+
+                AtivaFuncoes(configModel.idConfig, "flagIluminacao", flagLiga);
+                configModel.flagIluminacao = flagLiga;
                 #endregion
 
                 #region Verificando a Bomba de Água
