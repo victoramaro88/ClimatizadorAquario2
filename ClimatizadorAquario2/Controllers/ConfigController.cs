@@ -366,8 +366,12 @@ namespace ClimatizadorAquario2.Controllers
                     flagLiga = false;
                 }
 
-                AtivaFuncoes(configModel.idConfig, "flagIluminacao", flagLiga);
-                configModel.flagIluminacao = flagLiga;
+                if (flagLiga != configModel.flagIluminacao)
+                {
+                    AtivaFuncoes(configModel.idConfig, "flagIluminacao", flagLiga);
+                    configModel.flagIluminacao = flagLiga;
+                }
+
                 #endregion
 
                 #region Verificando a Bomba de Água
