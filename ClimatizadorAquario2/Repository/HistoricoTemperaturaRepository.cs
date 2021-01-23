@@ -18,7 +18,7 @@ namespace ClimatizadorAquario2.Repository
             _bdAquario = Configuration.GetValue<string>("CONEXAO_BD");
         }
 
-        public List<HistoricoTemperaturaModel> RetornaHistorico(DateTime dataInicio, DateTime dataFim)
+        public List<HistoricoTemperaturaModel> RetornaHistorico(string dataInicio, string dataFim)
         {
             List<HistoricoTemperaturaModel> listaRetorno = new List<HistoricoTemperaturaModel>();
             SqlDataReader reader = null;
@@ -29,28 +29,28 @@ namespace ClimatizadorAquario2.Repository
                 {
                     // ->FALTA VALIDAR ESSA QUERY AINDA, NÃO ESTÁ OK, COM ERRO.
                     query = @"
-                                DECLARE @dataInicio date = '2021-01-01';
-                                DECLARE @dataFim date = '2021-01-31';
-                                select @dataInicio
-                                select @dataFim
-                                IF @dataInicio <> is null AND @dataFim <> IS NULL
+                                -- DECLARE @dataInicio varchar(10) = '01-01-2021';
+                                -- DECLARE @dataFim varchar(10) = '31-01-2021';
+                                DECLARE @dataInicio varchar(10) = '"+ dataInicio + @"';
+                                DECLARE @dataFim varchar(10) = '" + dataFim + @"';
+                                IF @dataInicio <> '' AND @dataFim <> ''
 	                                BEGIN
 		                                SELECT 'COM DATA'
 		                                SELECT [idHistorico]
-			                                  ,[idConfig]
-			                                  ,[temperatura]
-			                                  ,[dataHoraRegistro]
-		                                  FROM [aquario].[amaro.victor].[HistoricoTemperatura]
-		                                  WHERE [dataHoraRegistro] >= @dataInicio AND [dataHoraRegistro] <= @dataFim
-                                  END
+			                                    ,[idConfig]
+			                                    ,[temperatura]
+			                                    ,[dataHoraRegistro]
+		                                    FROM [aquario].[amaro.victor].[HistoricoTemperatura]
+		                                    WHERE [dataHoraRegistro] BETWEEN CONVERT(DATE,  @dataInicio, 103) AND CONVERT(DATE, @dataFim, 103)
+                                    END
                                 ELSE
 	                                BEGIN
 		                                SELECT 'SEM DATA'
 		                                SELECT [idHistorico]
-			                                  ,[idConfig]
-			                                  ,[temperatura]
-			                                  ,[dataHoraRegistro]
-		                                  FROM [aquario].[amaro.victor].[HistoricoTemperatura]
+			                                    ,[idConfig]
+			                                    ,[temperatura]
+			                                    ,[dataHoraRegistro]
+		                                    FROM [aquario].[amaro.victor].[HistoricoTemperatura]
 	                                END";
 
                     SqlCommand com = new SqlCommand(query, con);
