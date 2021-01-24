@@ -31,11 +31,10 @@ namespace ClimatizadorAquario2.Repository
                     query = @"
                                 -- DECLARE @dataInicio varchar(10) = '01-01-2021';
                                 -- DECLARE @dataFim varchar(10) = '31-01-2021';
-                                DECLARE @dataInicio varchar(10) = '"+ dataInicio + @"';
+                                DECLARE @dataInicio varchar(10) = '" + dataInicio + @"';
                                 DECLARE @dataFim varchar(10) = '" + dataFim + @"';
                                 IF @dataInicio <> '' AND @dataFim <> ''
 	                                BEGIN
-		                                SELECT 'COM DATA'
 		                                SELECT [idHistorico]
 			                                    ,[idConfig]
 			                                    ,[temperatura]
@@ -45,7 +44,6 @@ namespace ClimatizadorAquario2.Repository
                                     END
                                 ELSE
 	                                BEGIN
-		                                SELECT 'SEM DATA'
 		                                SELECT [idHistorico]
 			                                    ,[idConfig]
 			                                    ,[temperatura]
@@ -59,15 +57,13 @@ namespace ClimatizadorAquario2.Repository
                     reader = com.ExecuteReader();
                     if (reader != null && reader.HasRows)
                     {
+                        var ret = new HistoricoTemperaturaModel();
                         while (reader.Read())
                         {
-                            var ret = new HistoricoTemperaturaModel()
-                            {
-                                idHistorico = long.Parse(reader["idHistorico"].ToString()),
-                                idConfig = int.Parse(reader["idConfig"].ToString()),
-                                temperatura = decimal.Parse(reader["temperatura"].ToString()),
-                                dataHoraRegistro = DateTime.Parse(reader["dataHoraRegistro"].ToString())
-                            };
+                            ret.idHistorico = reader["idHistorico"] != DBNull.Value ? long.Parse(reader["idHistorico"].ToString()) : (long)0;
+                            ret.idConfig = reader["idConfig"] != DBNull.Value ? int.Parse(reader["idConfig"].ToString()) : (int)0;
+                            ret.temperatura = reader["temperatura"] != DBNull.Value ? decimal.Parse(reader["temperatura"].ToString()) : (decimal)0;
+                            ret.dataHoraRegistro = reader["dataHoraRegistro"] != DBNull.Value ? DateTime.Parse(reader["dataHoraRegistro"].ToString()) : default;
 
                             listaRetorno.Add(ret);
                         }
@@ -81,6 +77,50 @@ namespace ClimatizadorAquario2.Repository
 
 
             return listaRetorno;
+        }
+
+        public string InsereHistorico(int idConfig, decimal temperatura)
+        {
+            string ret = "";
+
+            SqlDataReader reader = null;
+            var query = "";
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_bdAquario))
+                {
+                    query = @"
+                                DECLARE @idConfig int = " + idConfig + @";
+                                DECLARE @temperatura decimal(10,2) = " + temperatura.ToString().Replace(",", ".") + @";
+                                INSERT INTO [aquario].[amaro.victor].[HistoricoTemperatura]
+                                           ([idConfig]
+                                           ,[temperatura]
+                                           ,[dataHoraRegistro])
+                                     VALUES
+                                           (@idConfig
+                                           ,@temperatura
+                                           ,(SELECT GETDATE()))
+                            ";
+
+                    SqlCommand com = new SqlCommand(query, con);
+                    con.Open();
+
+                    reader = com.ExecuteReader();
+                    if (reader != null && reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            ret = reader["Retorno"].ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            return ret;
         }
     }
 }

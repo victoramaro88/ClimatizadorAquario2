@@ -16,9 +16,11 @@ namespace ClimatizadorAquario2.Controllers
     public class ConfigController : ControllerBase
     {
         private readonly ConfigRepository _configRepo;
+        private HistoricoController _historicoController;
         public ConfigController(IConfiguration iConfig)
         {
             _configRepo = new ConfigRepository(iConfig);
+            _historicoController = new HistoricoController(iConfig);
         }
 
         [HttpGet("{idConfig}/{senhaSecundaria}")]
@@ -47,6 +49,10 @@ namespace ClimatizadorAquario2.Controllers
                 var pesquisa = _configRepo.RetornaInfo();
                 ConfiguraStatusParametros(pesquisa);
                 var novaPesquisa = _configRepo.RetornaInfo();
+                //if (DateTime.Now.Minute == 00)
+                //{
+                //    _historicoController.InsereHistorico(novaPesquisa.idConfig, novaPesquisa.temperatura);
+                //}
                 return Ok(novaPesquisa);
             }
             catch (Exception ex)
