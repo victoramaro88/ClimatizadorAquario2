@@ -63,7 +63,7 @@ namespace ClimatizadorAquario2.Repository
                             ret.idHistorico = reader["idHistorico"] != DBNull.Value ? long.Parse(reader["idHistorico"].ToString()) : (long)0;
                             ret.idConfig = reader["idConfig"] != DBNull.Value ? int.Parse(reader["idConfig"].ToString()) : (int)0;
                             ret.temperatura = reader["temperatura"] != DBNull.Value ? decimal.Parse(reader["temperatura"].ToString()) : (decimal)0;
-                            ret.dataHoraRegistro = reader["dataHoraRegistro"] != DBNull.Value ? DateTime.Parse(reader["dataHoraRegistro"].ToString()) : default;
+                            ret.dataHoraRegistro = reader["dataHoraRegistro"] != DBNull.Value ? DateTime.Parse(reader["dataHoraRegistro"].ToString()) : default(DateTime);
 
                             listaRetorno.Add(ret);
                         }
@@ -91,15 +91,27 @@ namespace ClimatizadorAquario2.Repository
                 {
                     query = @"
                                 DECLARE @idConfig int = " + idConfig + @";
-                                DECLARE @temperatura decimal(10,2) = " + temperatura.ToString().Replace(",", ".") + @";
-                                INSERT INTO [aquario].[amaro.victor].[HistoricoTemperatura]
-                                           ([idConfig]
-                                           ,[temperatura]
-                                           ,[dataHoraRegistro])
-                                     VALUES
-                                           (@idConfig
-                                           ,@temperatura
-                                           ,(SELECT GETDATE()))
+                                DECLARE @temperatura decimal(10,2) =" + temperatura.ToString().Replace(",", ".") + @";
+
+                                IF
+	                                (SELECT COUNT(*) FROM [aquario].[amaro.victor].[HistoricoTemperatura]
+	                                WHERE (SELECT DATEPART(DAY,[dataHoraRegistro])) = (SELECT DATEPART(DAY,GETDATE()))
+			                                AND (SELECT DATEPART(HOUR,[dataHoraRegistro])) = (SELECT DATEPART(HOUR,GETDATE()))) = 0
+			                                BEGIN
+				                                INSERT INTO [aquario].[amaro.victor].[HistoricoTemperatura]
+				                                ([idConfig]
+				                                ,[temperatura]
+				                                ,[dataHoraRegistro])
+				                                VALUES
+					                                (@idConfig
+					                                ,@temperatura
+					                                ,(SELECT GETDATE()))
+				                                SELECT 'INSERIU' AS Retorno
+			                                END
+                                ELSE
+	                                BEGIN
+		                                SELECT 'NÃO INSERIU' AS Retorno
+	                                END
                             ";
 
                     SqlCommand com = new SqlCommand(query, con);

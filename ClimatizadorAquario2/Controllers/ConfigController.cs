@@ -49,10 +49,7 @@ namespace ClimatizadorAquario2.Controllers
                 var pesquisa = _configRepo.RetornaInfo();
                 ConfiguraStatusParametros(pesquisa);
                 var novaPesquisa = _configRepo.RetornaInfo();
-                //if (DateTime.Now.Minute == 00)
-                //{
-                //    _historicoController.InsereHistorico(novaPesquisa.idConfig, novaPesquisa.temperatura);
-                //}
+                _historicoController.InsereHistorico(novaPesquisa.idConfig, novaPesquisa.temperatura);
                 return Ok(novaPesquisa);
             }
             catch (Exception ex)
