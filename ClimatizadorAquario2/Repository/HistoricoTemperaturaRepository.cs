@@ -66,6 +66,7 @@ namespace ClimatizadorAquario2.Repository
                             ret.dataHoraRegistro = reader["dataHoraRegistro"] != DBNull.Value ? DateTime.Parse(reader["dataHoraRegistro"].ToString()) : default(DateTime);
 
                             listaRetorno.Add(ret);
+                            ret = new HistoricoTemperaturaModel();
                         }
                     }
                 }
