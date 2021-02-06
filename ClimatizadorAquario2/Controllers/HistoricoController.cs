@@ -19,13 +19,13 @@ namespace ClimatizadorAquario2.Controllers
             _historicoRepo = new HistoricoTemperaturaRepository(iConfig);
         }
 
-        [HttpGet("{dataInicio?}/{dataFim?}")]
+        [HttpGet("{tipoPesquisa?}/{dataInicio?}/{dataFim?}")] // -> Se for "1", traz por data, se for "2", traz os últimos 10.
         [Produces("application/json")]
-        public IActionResult RetornaHistorico(string dataInicio = "", string dataFim = "")
+        public IActionResult RetornaHistorico(byte tipoPesquisa, string dataInicio = "", string dataFim = "")
         {
             try
             {
-                var a = _historicoRepo.RetornaHistorico(dataInicio, dataFim);
+                var a = _historicoRepo.RetornaHistorico(tipoPesquisa, dataInicio, dataFim);
 
                 return Ok(a);
             }

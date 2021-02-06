@@ -18,7 +18,7 @@ namespace ClimatizadorAquario2.Repository
             _bdAquario = Configuration.GetValue<string>("CONEXAO_BD");
         }
 
-        public List<HistoricoTemperaturaModel> RetornaHistorico(string dataInicio, string dataFim)
+        public List<HistoricoTemperaturaModel> RetornaHistorico(byte tipoPesquisa, string dataInicio, string dataFim)
         {
             List<HistoricoTemperaturaModel> listaRetorno = new List<HistoricoTemperaturaModel>();
             SqlDataReader reader = null;
@@ -27,8 +27,9 @@ namespace ClimatizadorAquario2.Repository
             {
                 using (SqlConnection con = new SqlConnection(_bdAquario))
                 {
-                    // ->FALTA VALIDAR ESSA QUERY AINDA, NÃO ESTÁ OK, COM ERRO.
-                    query = @"
+                    if (tipoPesquisa == 1)
+                    {
+                        query = @"
                                 -- DECLARE @dataInicio varchar(10) = '01-01-2021';
                                 -- DECLARE @dataFim varchar(10) = '31-01-2021';
                                 DECLARE @dataInicio varchar(10) = '" + dataInicio + @"';
@@ -50,6 +51,35 @@ namespace ClimatizadorAquario2.Repository
 			                                    ,[dataHoraRegistro]
 		                                    FROM [aquario].[amaro.victor].[HistoricoTemperatura]
 	                                END";
+                    }
+                    else if(tipoPesquisa == 2)
+                    {
+                        query = @"
+                                -- DECLARE @dataInicio varchar(10) = '01-01-2021';
+                                -- DECLARE @dataFim varchar(10) = '31-01-2021';
+                                DECLARE @dataInicio varchar(10) = '" + dataInicio + @"';
+                                DECLARE @dataFim varchar(10) = '" + dataFim + @"';
+                                IF @dataInicio <> '' AND @dataFim <> ''
+	                                BEGIN
+		                                SELECT TOP (10) [idHistorico]
+			                                    ,[idConfig]
+			                                    ,[temperatura]
+			                                    ,[dataHoraRegistro]
+		                                    FROM [aquario].[amaro.victor].[HistoricoTemperatura]
+		                                    WHERE [dataHoraRegistro] BETWEEN CONVERT(DATE,  @dataInicio, 103) AND CONVERT(DATE, @dataFim, 103)
+                                            ORDER BY [idHistorico] DESC
+                                    END
+                                ELSE
+	                                BEGIN
+		                                SELECT TOP (10) [idHistorico]
+                                              ,[idConfig]
+                                              ,[temperatura]
+                                              ,[dataHoraRegistro]
+                                          FROM [aquario].[amaro.victor].[HistoricoTemperatura]
+                                          ORDER BY [idHistorico] DESC
+	                                END
+                                ";
+                    }
 
                     SqlCommand com = new SqlCommand(query, con);
                     con.Open();
