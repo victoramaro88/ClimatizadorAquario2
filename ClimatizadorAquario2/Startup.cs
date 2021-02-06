@@ -34,20 +34,9 @@ namespace ClimatizadorAquario2
                 options.AddPolicy(MyAllowSpecificOrigins,
                   builder =>
                   {
-                      builder.WithOrigins("http://example.com",
+                      builder.WithOrigins("https://www.victoramaro.com.br",
+                                          "http://www.victoramaro.com.br",
                                           "http://localhost:4200",
-                                          "http://localhost:4300",
-                                          "http://localhost:4201",
-                                          "http://localhost:51160",
-                                          "http://localhost:52536",
-                                          "http://srvhomolog01:8080",
-                                          "http://www.homolog.ccb.policiamilitar.sp.gov.br:8080",
-                                          "http://10.52.90.33:8080/",
-                                          "http://10.52.90.33/",
-                                          "http://10.52.89.23/",
-                                          "http://intranet.ccb.policiamilitar.sp.gov.br:8080",
-                                          "http://srvwdsv03",
-                                          "http://srvwhml03",
                                           "*"
                                           )
                 .AllowAnyHeader()
